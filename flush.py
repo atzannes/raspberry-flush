@@ -9,12 +9,11 @@ degrees_0 = 0.5  # min degrees
 degrees_180 = 2.5  # max degrees
 SIGNAL_PIN = 23  # GPIO_11
 
-def init_servo():
+def init_gpio():
     # Initialization
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(SIGNAL_PIN, GPIO.OUT)
 
-def shutdown_servo():
+def shutdown_gpio():
     GPIO.cleanup()
 
 # Helper
@@ -22,7 +21,7 @@ def set_servo(degrees):
     MOVE_TIME = 1
     # compute the duty cycle percentage for angle==degrees
     if not 0 <= degrees <= 180:
-        logger.warning(
+        logging.warning(
             "Cannot set servo angle to {}. Valid angles in [0, 180]"
             .format(degrees)
         )
@@ -38,6 +37,7 @@ def flush():
     # Waive
     home_angle = 170
     waive_angle = 10
+    GPIO.setup(SIGNAL_PIN, GPIO.OUT)
 
     set_servo(home_angle)
     set_servo(waive_angle)
@@ -46,6 +46,11 @@ def flush():
 
 
 if __name__ == "__main__":
-    init_servo()
-    flush()
-    shutdown_servo()
+    init_gpio()
+
+    try:
+        flush()
+
+    finally:
+        shutdown_gpio()
+
